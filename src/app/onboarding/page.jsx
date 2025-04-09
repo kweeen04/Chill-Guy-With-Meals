@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { UserPreferencesContext } from '../../context/UserPreferencesContext';
 import toast from 'react-hot-toast';
 import { motion } from 'framer-motion';
-
+import ProgressIndicator from './components/ProgressIndicator';
 export default function Onboarding() {
   const { data: session, update } = useSession();
   const { setPreferences } = useContext(UserPreferencesContext);
@@ -71,11 +71,14 @@ export default function Onboarding() {
   if (!session) return <div>Please sign in</div>;
 
   return (
+    <>  <ProgressIndicator step={step} />
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       className="min-h-screen flex items-center justify-center bg-gray-100"
     >
+    
+     
       <form onSubmit={handleSubmit} className="bg-white p-6 rounded-lg shadow-lg w-full max-w-md">
         {step === 1 && (
           <>
@@ -283,6 +286,6 @@ export default function Onboarding() {
           </>
         )}
       </form>
-    </motion.div>
+    </motion.div></>
   );
 }
