@@ -185,7 +185,7 @@ export default function MealPlan() {
     const mealsOfType = currentPlan.meals.filter((meal) => meal.type === type);
     if (mealsOfType.length === 0) return null; // Hide section if no meals of this type
     return (
-      <div>
+      <div className='mx-16'>
         <div className="flex justify-between items-center mb-3">
           <h2 className="text-lg font-semibold text-gray-800">{type}</h2>
           <span className="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-sm">
@@ -226,42 +226,45 @@ export default function MealPlan() {
       animate={{ opacity: 1, y: 0 }}
       className="w-full min-h-screen"
     >
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex items-center justify-between mb-6 mt-16 px-12">
         <h1 className="text-2xl font-bold text-gray-800">Meals</h1>
         <div className="flex items-center gap-3">
-          <button
-            onClick={() => setDate(new Date(date.setDate(date.getDate() - 1)))}
-            className="text-blue-600 hover:text-blue-800"
-          >
-            &lt;
-          </button>
-          <div className="relative">
+
+          <div className='mr-9 flex'>
             <button
-              onClick={() => setShowCalendar(!showCalendar)}
-              className="px-4 py-2 text-blue-600 hover:text-blue-800 flex items-center gap-2"
+              onClick={() => setDate(new Date(date.setDate(date.getDate() - 1)))}
+              className="text-blue-600 hover:text-blue-800 cursor-pointer"
             >
-              <span>{format(date, 'EEEE, MMM d')}</span>
+              &lt;
             </button>
-            {showCalendar && (
-              <div className="absolute top-full right-0 mt-2 bg-white rounded-lg shadow-lg p-4 z-50">
-                <input
-                  type="date"
-                  value={format(date, 'yyyy-MM-dd')}
-                  onChange={(e) => {
-                    setDate(new Date(e.target.value));
-                    setShowCalendar(false);
-                  }}
-                  className="p-2 border rounded"
-                />
-              </div>
-            )}
+            <div className="relative">
+              <button
+                onClick={() => setShowCalendar(!showCalendar)}
+                className="px-4 py-2 text-blue-600 hover:text-blue-800 flex items-center gap-2"
+              >
+                <span>{format(date, 'EEEE, MMM d')}</span>
+              </button>
+              {showCalendar && (
+                <div className="absolute top-full right-0 mt-2 bg-white rounded-lg shadow-lg p-4 z-50">
+                  <input
+                    type="date"
+                    value={format(date, 'yyyy-MM-dd')}
+                    onChange={(e) => {
+                      setDate(new Date(e.target.value));
+                      setShowCalendar(false);
+                    }}
+                    className="p-2 border rounded"
+                  />
+                </div>
+              )}
+            </div>
+            <button
+              onClick={() => setDate(new Date(date.setDate(date.getDate() + 1)))}
+              className="text-blue-600 hover:text-blue-800 cursor-pointer"
+            >
+              &gt;
+            </button>
           </div>
-          <button
-            onClick={() => setDate(new Date(date.setDate(date.getDate() + 1)))}
-            className="text-blue-600 hover:text-blue-800"
-          >
-            &gt;
-          </button>
           {!currentPlan ? (
             <button
               onClick={generateMealPlan}
@@ -275,7 +278,7 @@ export default function MealPlan() {
             <button
               onClick={regenerateMealPlan}
               disabled={isRegenerating}
-              className="px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+              className="cursor-pointer px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
             >
               <Utensils className="h-4 w-4" />
               {isRegenerating ? 'Regenerating...' : 'Regenerate Meal Plan'}
