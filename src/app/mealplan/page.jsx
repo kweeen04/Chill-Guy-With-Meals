@@ -4,12 +4,12 @@ import { useState, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { format } from 'date-fns';
-import { Utensils } from 'lucide-react';
+import { Utensils, Sparkles } from 'lucide-react';
 import toast from 'react-hot-toast';
 import Link from 'next/link';
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
 import { Pie } from 'react-chartjs-2';
-
+import { useRouter } from 'next/navigation';
 ChartJS.register(ArcElement, Tooltip, Legend);
 
 export default function MealPlan() {
@@ -20,6 +20,8 @@ export default function MealPlan() {
   const [isGenerating, setIsGenerating] = useState(false);
   const [isRegenerating, setIsRegenerating] = useState(false);
   const [showCalendar, setShowCalendar] = useState(false);
+
+  const router = useRouter()
 
   useEffect(() => {
     const fetchMealPlans = async () => {
@@ -284,6 +286,14 @@ export default function MealPlan() {
               {isRegenerating ? 'Regenerating...' : 'Regenerate Meal Plan'}
             </button>
           )}
+          <button
+            onClick={() => { router.push("/mealplan/aiSuggest") }}
+            className="cursor-pointer px-4 py-2 bg-cyan-500 text-white rounded-lg hover:bg-cyan-600 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+          >
+            <Sparkles className="h-4 w-4" />
+            AI Meal Plan
+          </button>
+
         </div>
       </div>
 

@@ -1,16 +1,28 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { PaperAirplaneIcon } from "@heroicons/react/24/outline";
-const GoalComponent = () => {
+
+const AIChatbot = () => {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    // Initial welcome message
+    setMessages([
+      {
+        text: "👋 Hey there! I'm your Chill Meal assistant. Let me know your goals or preferences, and I'll help you plan the perfect meals!",
+        sender: "bot",
+      },
+    ]);
+  }, []);
 
   const sendMessage = async () => {
     if (!input.trim()) return;
 
     setLoading(true);
-    setMessages([...messages, { text: input, sender: "user" }]);
+    setMessages((prev) => [...prev, { text: input, sender: "user" }]);
+    const userMessage = input;
     setInput("");
 
     try {
@@ -19,7 +31,7 @@ const GoalComponent = () => {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ message: input }),
+        body: JSON.stringify({ message: userMessage }),
       });
 
       if (!response.ok) throw new Error("Failed to fetch response");
@@ -33,7 +45,7 @@ const GoalComponent = () => {
       console.error("Error sending message:", error);
       setMessages((prev) => [
         ...prev,
-        { text: "Sorry, an error occurred.", sender: "bot" },
+        { text: "❌ Sorry, an error occurred.", sender: "bot" },
       ]);
     } finally {
       setLoading(false);
@@ -79,13 +91,13 @@ const GoalComponent = () => {
         <button
           onClick={sendMessage}
           disabled={loading}
-          className="ring-1 ring-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-300 transition disabled:opacity-50 text-sm cursor-pointer"
+          className="bg-gradient-to-r from-cyan-500 to-blue-500 hover:bg-gradient-to-bl focus:ring-4 focus:outline-none focus:ring-cyan-300 dark:focus:ring-cyan-800 text-white px-4 py-2 rounded-lg  transition disabled:opacity-50 text-sm cursor-pointer"
         >
-         <PaperAirplaneIcon className="h-5 w-5 text-blue-500 hover:text-white" />
+          <PaperAirplaneIcon className="h-5 w-5 text-white" />
         </button>
       </div>
     </div>
   );
 };
 
-export default GoalComponent;
+export default AIChatbot;
