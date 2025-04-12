@@ -70,7 +70,8 @@ export default function Onboarding() {
   if (!session) return <div>Please sign in</div>;
 
   return (
-    <>  <ProgressIndicator step={step} />
+    <>
+      <ProgressIndicator step={step} />
       <div className="bg-blue-50 flex items-center justify-center min-h-screen">
         <div className="text-center">
           <h1 className="text-2xl md:text-3xl font-bold mb-6">
@@ -302,7 +303,7 @@ export default function Onboarding() {
 
                   <button
                     type="submit"
-                    onClick={handleNext}
+
                     className="w-full bg-cyan-600 text-white py-3 rounded-lg text-lg font-bold hover:bg-cyan-500 transition duration-300 cursor-pointer"
                   >
                     FINISH

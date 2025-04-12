@@ -6,12 +6,12 @@ import toast from 'react-hot-toast';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 import { Tab } from '@headlessui/react';
-import { UserIcon, HeartIcon, CameraIcon, ScaleIcon, ArrowsUpDownIcon, CalendarIcon } from '@heroicons/react/24/outline';
+import { UserIcon, HeartIcon, CameraIcon, ScaleIcon, ArrowsUpDownIcon, CalendarIcon, BeakerIcon } from '@heroicons/react/24/outline';
 
 const containerVariants = {
   hidden: { opacity: 0, y: 20 },
-  visible: { 
-    opacity: 1, 
+  visible: {
+    opacity: 1,
     y: 0,
     transition: { duration: 0.6, ease: "easeOut" }
   }
@@ -19,8 +19,8 @@ const containerVariants = {
 
 const itemVariants = {
   hidden: { opacity: 0, x: -20 },
-  visible: { 
-    opacity: 1, 
+  visible: {
+    opacity: 1,
     x: 0,
     transition: { duration: 0.4 }
   }
@@ -72,7 +72,7 @@ export default function Profile() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     let profileImageUrl = session?.user?.profile?.profileImageUrl || '';
-    
+
     if (imageFile) {
       const formDataImage = new FormData();
       formDataImage.append('file', imageFile);
@@ -148,7 +148,7 @@ export default function Profile() {
                   <button
                     className={`
                       flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium
-                      ${selected 
+                      ${selected
                         ? 'bg-white dark:bg-gray-800 text-gray-900 dark:text-white shadow'
                         : 'text-gray-700 dark:text-gray-300 hover:bg-white/[0.12] hover:text-gray-900'
                       }
@@ -164,7 +164,23 @@ export default function Profile() {
                   <button
                     className={`
                       flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium
-                      ${selected 
+                      ${selected
+                        ? 'bg-white dark:bg-gray-800 text-gray-900 dark:text-white shadow'
+                        : 'text-gray-700 dark:text-gray-300 hover:bg-white/[0.12] hover:text-gray-900'
+                      }
+                    `}
+                  >
+                    <BeakerIcon className="w-4 h-4" />
+                    Diet Information
+                  </button>
+                )}
+              </Tab>
+              <Tab as={Fragment}>
+                {({ selected }) => (
+                  <button
+                    className={`
+                      flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium
+                      ${selected
                         ? 'bg-white dark:bg-gray-800 text-gray-900 dark:text-white shadow'
                         : 'text-gray-700 dark:text-gray-300 hover:bg-white/[0.12] hover:text-gray-900'
                       }
@@ -275,7 +291,7 @@ export default function Profile() {
 
                     <button
                       type="submit"
-                      className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg font-medium transition-colors"
+                      className="w-full bg-cyan-500 hover:bg-cyan-600 text-white py-2 px-4 rounded-lg font-medium transition-colors"
                     >
                       Update Profile
                     </button>

@@ -1,3 +1,4 @@
+
 import Image from 'next/image'
 
 import { Border } from '@/components/Border'
@@ -177,11 +178,6 @@ function Team() {
   )
 }
 
-export const metadata = {
-  title: 'About Us',
-  description:
-    'We believe that our strength lies in our collaborative approach, which puts our clients at the center of everything we do.',
-}
 
 export default async function About() {
   let blogArticles = (await loadArticles()).slice(0, 2)
