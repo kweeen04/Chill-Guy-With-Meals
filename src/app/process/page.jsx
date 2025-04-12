@@ -229,11 +229,6 @@ function Values() {
   )
 }
 
-export const metadata = {
-  title: 'Our Process',
-  description:
-    'We believe in efficiency and maximizing our resources to provide the best value to our clients.',
-}
 
 export default function Process() {
   return (

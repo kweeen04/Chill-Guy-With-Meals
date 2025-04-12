@@ -11,7 +11,9 @@ import {
   Tooltip,
   Legend,
 } from 'chart.js';
-
+import MealList from './MealList';
+import { PageIntro } from '@/components/PageIntro';
+import { FlameIcon, BarChartIcon, TargetIcon } from 'lucide-react';
 ChartJS.register(BarElement, CategoryScale, LinearScale, Tooltip, Legend);
 
 export default function MealPlannerPage() {
@@ -110,41 +112,29 @@ export default function MealPlannerPage() {
   return (
     <div className="min-h-screen bg-gray-50 p-6">
       <div className="max-w-3xl mx-auto bg-white shadow-md rounded-lg p-8">
-        <h1 className="text-2xl font-bold mb-6">AI Meal Planner</h1>
+        <PageIntro eyebrow="Premium featured" title="AI Meal Planner">
+          <p>
+            Our AI Meal Planner is designed to help you achieve your fitness
+            goals by providing personalized meal plans tailored to your dietary
+            needs and preferences.
+          </p>
+        </PageIntro>
+
 
         <button
           onClick={generateMealPlan}
           disabled={loading}
-          className="bg-cyan-600 text-white py-2 px-4 rounded hover:bg-cyan-700 transition disabled:opacity-50 flex"
+          className="mt-12 bg-cyan-600 text-white py-2 px-4 rounded hover:bg-cyan-700 transition disabled:opacity-50 flex cursor-pointer"
         >
           <WandSparkles className="h-4 w-4 mr-2" />
           {loading ? 'Generating...' : 'Generate Meal Plan'}
         </button>
 
         {error && <p className="text-red-500 mt-4">{error}</p>}
-
+        {mealPlan && <MealList mealPlan={mealPlan} />}
         {mealPlan && (
           <div className="mt-8 space-y-6">
-            {mealPlan.meals?.map((meal, idx) => (
-              <div key={idx} className="p-4 border rounded shadow-sm">
-                <h3 className="text-lg font-bold capitalize">{meal.type}</h3>
-                <p className="text-gray-700">{meal.name}</p>
-                <p className="text-sm text-gray-500">
-                  Calories: {meal.calories}
-                </p>
-                <p className="text-sm text-gray-500">
-                  Macros: {meal.macros.protein}g P / {meal.macros.carbs}g C /{' '}
-                  {meal.macros.fat}g F
-                </p>
-                {meal.imageUrl && (
-                  <img
-                    src={meal.imageUrl}
-                    alt={meal.name}
-                    className="mt-2 w-full max-w-sm rounded"
-                  />
-                )}
-              </div>
-            ))}
+
 
             {/* Horizontal Bar Chart */}
             <div className="bg-gray-50 rounded p-4 shadow">
@@ -155,20 +145,26 @@ export default function MealPlannerPage() {
             </div>
 
             {/* Total Stats */}
-            <div className="p-4 bg-gray-100 rounded">
-              <p>
-                <strong>Total Calories:</strong> {mealPlan.totalCalories}
-              </p>
-              <p>
-                <strong>Total Macros:</strong>{' '}
-                {mealPlan.totalMacros.protein}g P /{' '}
-                {mealPlan.totalMacros.carbs}g C /{' '}
-                {mealPlan.totalMacros.fat}g F
-              </p>
-              <p>
-                <strong>Target Calories:</strong> {mealPlan.targetCalories}
-              </p>
+            <div className="p-6 bg-white rounded-2xl shadow-md dark:bg-gray-900 space-y-4">
+              <div className="flex items-center gap-3">
+                <FlameIcon className="text-red-500 w-5 h-5" />
+                <p className="text-sm text-gray-500 dark:text-gray-400">Total Calories</p>
+                <p className="ml-auto text-base font-semibold text-gray-900 dark:text-white">{mealPlan.totalCalories}</p>
+              </div>
+              <div className="flex items-center gap-3">
+                <BarChartIcon className="text-blue-500 w-5 h-5" />
+                <p className="text-sm text-gray-500 dark:text-gray-400">Total Macros</p>
+                <p className="ml-auto text-base font-semibold text-gray-900 dark:text-white">
+                  {mealPlan.totalMacros.protein}g P / {mealPlan.totalMacros.carbs}g C / {mealPlan.totalMacros.fat}g F
+                </p>
+              </div>
+              <div className="flex items-center gap-3">
+                <TargetIcon className="text-green-500 w-5 h-5" />
+                <p className="text-sm text-gray-500 dark:text-gray-400">Target Calories</p>
+                <p className="ml-auto text-base font-semibold text-gray-900 dark:text-white">{mealPlan.targetCalories}</p>
+              </div>
             </div>
+
           </div>
         )}
       </div>

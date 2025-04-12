@@ -24,11 +24,7 @@ import { SocialMedia } from '@/components/SocialMedia'
 import { useSession, signOut } from 'next-auth/react'
 import { Dialog, Disclosure, Popover, Transition } from "@headlessui/react";
 import {
-  ChevronDownIcon,
-  PhoneIcon,
-  AdjustmentsHorizontalIcon,
-  GlobeAltIcon,
-  ShoppingCartIcon,
+
   UserIcon,
   ArrowRightIcon
 } from "@heroicons/react/20/solid";
@@ -110,7 +106,7 @@ function Header({
                 <Popover.Panel className="absolute -left-8 top-full isolate z-10 mt-3  w-[150px] overflow-hidden rounded-3xl bg-white shadow-lg ring-1 ring-gray-900/5">
                   <div className="z-30 grid grid-cols-1 divide-x divide-gray-900/5 bg-gray-50">
                     <Link
-                      href="/profile"
+                      href="/profile/info"
                       className="flex items-center justify-center gap-x-2.5 p-3 text-sm font-semibold leading-6 text-gray-900 hover:bg-gray-100 dark:text-black cursor-pointer"
                     >
                       <UserIcon
@@ -149,7 +145,7 @@ function Header({
             aria-expanded={expanded ? 'true' : 'false'}
             aria-controls={panelId}
             className={clsx(
-              'group -m-2.5 rounded-full p-2.5 transition',
+              'group -m-2.5 rounded-full p-2.5 transition cursor-pointer',
               invert ? 'hover:bg-white/10' : 'hover:bg-neutral-950/10',
             )}
             aria-label="Toggle navigation"
@@ -194,11 +190,7 @@ function NavigationItem({ href, children }) {
 function Navigation() {
   return (
     <nav className="mt-px font-display text-5xl font-medium tracking-tight text-white">
-      {/* <NavigationRow>
-        <NavigationItem href="/work">Our Work</NavigationItem>
-      <NavigationItem href="/process">Our Process</NavigationItem>
-      </NavigationRow>
- */}
+
       <NavigationRow>
         <NavigationItem href="/subscriptions">Subscriptions</NavigationItem>
         <NavigationItem href="/about">About Us</NavigationItem>

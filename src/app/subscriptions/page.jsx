@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { loadStripe } from "@stripe/stripe-js";
 import { Elements, CardElement, useStripe, useElements } from "@stripe/react-stripe-js";
 import { CheckIcon } from '@heroicons/react/20/solid'
+import { Loader2, AlertTriangle } from "lucide-react"
 // Debug imports
 console.log("Stripe Imports:", { Elements, CardElement, useStripe, useElements });
 
@@ -12,7 +13,7 @@ const stripePromise = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
   : Promise.reject(new Error("Stripe publishable key is not defined"));
 
 function Pricing({ plans, handlePlanSelect }) {
- 
+
   function classNames(...classes) {
     return classes.filter(Boolean).join(' ')
   }
@@ -179,16 +180,58 @@ function CheckoutForm({ plan }) {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
-      <CardElement className="p-2 border rounded" />
-      {error && <p className="text-red-500">{error}</p>}
+    <form onSubmit={handleSubmit} className="space-y-6 max-w-md w-full mx-auto">
+      <div className="space-y-2">
+        <label htmlFor="card-element" className="block text-xl font-medium text-gray-700">
+          Card Details
+        </label>
+        <div className="text-xs text-gray-500 mb-2">
+          Enter your credit or debit card information securely.
+        </div>
+        <div className="border rounded-md px-3 py-2 border-gray-300 focus-within:ring-2 focus-within:ring-blue-500 transition-all duration-150">
+          <CardElement
+            id="card-element"
+            className="bg-transparent text-base"
+            options={{
+              style: {
+                base: {
+                  fontSize: '16px',
+                  color: '#1a202c',
+                  '::placeholder': {
+                    color: '#a0aec0',
+                  },
+                },
+                invalid: {
+                  color: '#e53e3e',
+                },
+              },
+            }}
+          />
+        </div>
+        {error && (
+          <p className="text-sm text-red-500 flex items-center gap-1 mt-1">
+            <AlertTriangle className="w-4 h-4" /> {error}
+          </p>
+        )}
+      </div>
+
       <button
         type="submit"
         disabled={!stripe || loading}
-        className="bg-blue-500 text-white px-4 py-2 rounded disabled:bg-gray-400"
+        className="w-full flex items-center justify-center gap-2 bg-gradient-to-br from-purple-600 to-blue-500 hover:from-purple-700 hover:to-blue-600 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:focus:ring-blue-800 text-white px-6 py-3 rounded-md font-medium disabled:bg-gray-400 transition-all duration-200"
+        aria-disabled={!stripe || loading}
+        aria-busy={loading}
       >
+        {loading && <Loader2 className="animate-spin w-5 h-5" />}
         {loading ? "Processing..." : `Pay $${plan.amount / 100}/${plan.interval}`}
       </button>
+
+      <div className="text-xs text-gray-500 text-center">
+        By subscribing, you agree to our{" "}
+        <a href="/terms" className="underline hover:text-blue-600 transition">Terms of Service</a>{" "}
+        and{" "}
+        <a href="/privacy" className="underline hover:text-blue-600 transition">Privacy Policy</a>.
+      </div>
     </form>
   );
 }
