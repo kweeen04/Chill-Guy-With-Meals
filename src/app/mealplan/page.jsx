@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { format } from 'date-fns';
-import { Utensils, Sparkles } from 'lucide-react';
+import { Utensils, Sparkles, Calendar } from 'lucide-react';
 import toast from 'react-hot-toast';
 import Link from 'next/link';
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
@@ -88,6 +88,33 @@ export default function MealPlan() {
         toast.success('Meal plan regenerated successfully!', {
           id: loadingToast,
         });
+      } else {
+        throw new Error('Failed to regenerate meal plan');
+      }
+    } catch (error) {
+      toast.error('Failed to regenerate meal plan', {
+        id: loadingToast,
+      });
+    } finally {
+      setIsRegenerating(false);
+    }
+  };
+
+  const generateWeeklyMealPlan = async () => {
+    setIsRegenerating(true);
+    const loadingToast = toast.loading('Generating weekly meal plan...');
+    try {
+      const res = await fetch('/api/mealplan/weeklyGenerate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ startDate: format(new Date(), 'yyyy-MM-dd') }),
+      });
+      if (res.ok) {
+
+        toast.success('Weekly Meal plan regenerated successfully!', {
+          id: loadingToast,
+        });
+        router.refresh();
       } else {
         throw new Error('Failed to regenerate meal plan');
       }
@@ -271,29 +298,35 @@ export default function MealPlan() {
             <button
               onClick={generateMealPlan}
               disabled={isGenerating}
-              className="px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+              className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
             >
               <Utensils className="h-4 w-4" />
-              {isGenerating ? 'Generating...' : 'Generate Meal Plan'}
+              {isGenerating ? 'Generating...' : 'Generate'}
             </button>
           ) : (
             <button
               onClick={regenerateMealPlan}
               disabled={isRegenerating}
-              className="cursor-pointer px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+              className="cursor-pointer px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg shadow-md disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 transition-all"
             >
               <Utensils className="h-4 w-4" />
-              {isRegenerating ? 'Regenerating...' : 'Regenerate Meal Plan'}
+              {isRegenerating ? 'Regenerating...' : 'Regenerate'}
             </button>
           )}
           <button
+            onClick={generateWeeklyMealPlan}
+            className="cursor-pointer px-4 py-2 bg-teal-500 hover:bg-teal-600 text-white rounded-lg shadow-md  disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+          >
+            <Calendar className="h-4 w-4" />
+            Weekly Generate
+          </button>
+<button
             onClick={() => { router.push("/mealplan/aiSuggest") }}
-            className="cursor-pointer px-4 py-2 bg-cyan-500 text-white rounded-lg hover:bg-cyan-600 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+            className="cursor-pointer px-4 py-2 bg-black text-white rounded-lg hover:bg-gray- disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
           >
             <Sparkles className="h-4 w-4" />
-            AI Meal Plan
+           AI
           </button>
-
         </div>
       </div>
 

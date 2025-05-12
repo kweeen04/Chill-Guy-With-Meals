@@ -5,6 +5,8 @@ import toast from 'react-hot-toast';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 import { GridIcon, ListIcon, FilterIcon, UtensilsIcon } from 'lucide-react';
+import RecipeService from '@/services/RecipeService';
+
 export default function Recipes() {
   const { data: session } = useSession();
   const [recipes, setRecipes] = useState([]);
@@ -13,11 +15,8 @@ export default function Recipes() {
 
   useEffect(() => {
     const fetchRecipes = async () => {
-      const res = await fetch('/api/recipes');
-      if (res.ok) {
-        const data = await res.json();
-        setRecipes(data);
-      }
+      const data = await RecipeService.getAllRecipes()
+      setRecipes(data);
     };
     if (session) fetchRecipes();
   }, [session]);

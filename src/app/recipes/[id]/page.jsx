@@ -8,11 +8,12 @@ import { jsPDF } from 'jspdf';
 import emailjs from '@emailjs/browser';
 import { Heart, Download, Mail, Share2, Star, Twitter, Facebook } from 'lucide-react';
 import { use } from 'react';
+import RecipeService from '@/services/RecipeService';
 
 export default function RecipeDetails({ params }) {
   const resolvedParams = use(params);
   const recipeId = resolvedParams.id;
-  
+
   const { data: session } = useSession();
   const router = useRouter();
   const [recipe, setRecipe] = useState(null);
@@ -25,9 +26,9 @@ export default function RecipeDetails({ params }) {
 
   useEffect(() => {
     const fetchRecipe = async () => {
-      const res = await fetch(`/api/recipes/${recipeId}`);
-      if (res.ok) {
-        const data = await res.json();
+      const data = await RecipeService.getRecipeById(recipeId);
+    //  const res = await fetch(`/api/recipes/${recipeId}`);
+      if (data) {
         setRecipe(data);
         if (session) {
           setIsFavorite(session.user.favorites.includes(recipeId));
@@ -151,14 +152,14 @@ export default function RecipeDetails({ params }) {
   const shareViaEmail = () => {
     const recipientEmail = prompt('Enter recipient email:');
     if (!recipientEmail) return;
-    
+
     const templateParams = {
       to_email: recipientEmail,
       recipe_title: recipe.title,
       recipe_description: recipe.description,
       recipe_link: window.location.href,
     };
-    
+
     emailjs.send(
       process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID,
       process.env.NEXT_PUBLIC_EMAILJS_TEMPLATE_ID,
@@ -206,13 +207,13 @@ export default function RecipeDetails({ params }) {
     >
       <div className="bg-white rounded-lg shadow-lg overflow-hidden">
         <div className="p-6">
+          <img src={recipe.imageUrl} className='w-1/3 h-auto my-4 mx-auto rounded-lg shadow-xl' />
           <div className="flex items-center justify-between mb-4">
             <h1 className="text-3xl font-bold">{recipe.title}</h1>
             <button
               onClick={toggleFavorite}
-              className={`p-2 rounded-full ${
-                isFavorite ? 'bg-red-500 text-white' : 'bg-gray-100 hover:bg-gray-200'
-              }`}
+              className={`p-2 rounded-full ${isFavorite ? 'bg-red-500 text-white' : 'bg-gray-100 hover:bg-gray-200'
+                }`}
             >
               <Heart className={isFavorite ? "fill-current" : ""} />
             </button>
@@ -234,25 +235,23 @@ export default function RecipeDetails({ params }) {
           </div>
 
           <p className="text-gray-600 mb-6">{recipe.description}</p>
-          
+
           <div className="mb-6">
             <div className="flex border-b mb-4">
               <button
-                className={`px-4 py-2 ${
-                  activeTab === 'ingredients'
-                    ? 'border-b-2 border-blue-500 text-blue-500'
-                    : 'text-gray-500'
-                }`}
+                className={`px-4 py-2 ${activeTab === 'ingredients'
+                  ? 'border-b-2 border-blue-500 text-blue-500'
+                  : 'text-gray-500'
+                  }`}
                 onClick={() => setActiveTab('ingredients')}
               >
                 Ingredients
               </button>
               <button
-                className={`px-4 py-2 ${
-                  activeTab === 'instructions'
-                    ? 'border-b-2 border-blue-500 text-blue-500'
-                    : 'text-gray-500'
-                }`}
+                className={`px-4 py-2 ${activeTab === 'instructions'
+                  ? 'border-b-2 border-blue-500 text-blue-500'
+                  : 'text-gray-500'
+                  }`}
                 onClick={() => setActiveTab('instructions')}
               >
                 Instructions

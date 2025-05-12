@@ -102,7 +102,7 @@ export default function SignUpPage() {
         <button
           disabled={isLoading}
           type="submit" color="cyan" className="cursor-pointer mt-8 w-full bg-black text-white py-2 rounded-md shadow-sm hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2 font-medium">
-          {isLoading ? "Loading..." : "Sign in to account"}
+          {isLoading ? "Loading..." : "Create Account"}
         </button>
       </form>
       <div className="mt-10">

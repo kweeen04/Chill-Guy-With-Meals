@@ -1,75 +1,73 @@
 'use client';
 import { useState, useEffect } from 'react';
+import RecipeService from '@/services/RecipeService';
 
 export default function CreateRecipes() {
-    const [formData, setFormData] = useState({
-        title: '',
-        description: '',
-        ingredients: '',
-        instructions: '',
-        calories: '',
-        protein: '',
-        carbs: '',
-        fat: '',
-        diet: 'none',
-        image: '',
-    });
-    const handleChange = (e) => {
-        setFormData({ ...formData, [e.target.name]: e.target.value });
-    };
+  const [formData, setFormData] = useState({
+    title: '',
+    description: '',
+    ingredients: '',
+    instructions: '',
+    calories: '',
+    protein: '',
+    carbs: '',
+    fat: '',
+    diet: 'none',
+    image: '',
+  });
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        try {
-            const ingredients = formData.ingredients.split(',').map((item) => ({
-                name: item.trim(),
-                amount: '1 serving',
-            }));
-            const instructions = formData.instructions.split(',').map((item) => item.trim());
-            const res = await fetch('/api/recipes', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    ...formData,
-                    ingredients,
-                    instructions,
-                    calories: Number(formData.calories),
-                    macros: {
-                        protein: Number(formData.protein),
-                        carbs: Number(formData.carbs),
-                        fat: Number(formData.fat),
-                    },
-                }),
-            });
-            if (res.ok) {
-                const newRecipe = await res.json();
-                setRecipes((prev) => [...prev, newRecipe]);
-                toast.success('Recipe added!');
-                setFormData({
-                    title: '',
-                    description: '',
-                    ingredients: '',
-                    instructions: '',
-                    calories: '',
-                    protein: '',
-                    carbs: '',
-                    fat: '',
-                    diet: 'none',
-                    image: '',
-                });
-            } else {
-                toast.error('Failed to add recipe.');
-            }
-        } catch (error) {
-            toast.error('Something went wrong.');
-        }
-    };
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const ingredients = formData.ingredients.split(',').map((item) => ({
+        name: item.trim(),
+        amount: '1 serving',
+      }));
+      const instructions = formData.instructions.split(',').map((item) => item.trim());
+      const newRecipe = RecipeService.createRecipe({
+        ...formData,
+        ingredients,
+        instructions,
+        calories: Number(formData.calories),
+        macros: {
+          protein: Number(formData.protein),
+          carbs: Number(formData.carbs),
+          fat: Number(formData.fat),
+        },
+      })
 
-    if (!session) return <div>Please sign in</div>;
-    return (
-        <div>
-            {/* Add Recipe Form */}
-            {/* <form onSubmit={handleSubmit} className="bg-white p-6 rounded-lg shadow-lg mb-6 w-full">
+      if (newRecipe) {
+        // const newRecipe = await res.json();
+        setRecipes((prev) => [...prev, newRecipe]);
+        toast.success('Recipe added!');
+        setFormData({
+          title: '',
+          description: '',
+          ingredients: '',
+          instructions: '',
+          calories: '',
+          protein: '',
+          carbs: '',
+          fat: '',
+          diet: 'none',
+          image: '',
+        });
+      } else {
+        toast.error('Failed to add recipe.');
+      }
+    } catch (error) {
+      toast.error('Something went wrong.');
+    }
+  };
+
+  if (!session) return <div>Please sign in</div>;
+  return (
+    <div>
+      {/* Add Recipe Form */}
+      {/* <form onSubmit={handleSubmit} className="bg-white p-6 rounded-lg shadow-lg mb-6 w-full">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {[
           ['title', 'Title', 'text'],
@@ -128,5 +126,5 @@ export default function CreateRecipes() {
         Add Recipe
       </button>
     </form> */}</div>
-    )
+  )
 }

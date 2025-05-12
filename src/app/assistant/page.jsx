@@ -53,7 +53,7 @@ const AIChatbot = () => {
   };
 
   return (
-    <div className="flex flex-col h-[600px] bg-gray-50 p-4 mx-auto max-w-3xl">
+    <div className="flex flex-col h-[600px] bg-gray-50 p-4 mx-auto max-w-3xl shadow-lg">
       <div className="flex-1 overflow-y-auto space-y-3 pb-4">
         {messages.map((message, index) => (
           <div

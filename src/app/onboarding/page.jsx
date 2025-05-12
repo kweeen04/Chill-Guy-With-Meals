@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { UserPreferencesContext } from '../../context/UserPreferencesContext';
 import toast from 'react-hot-toast';
 import ProgressIndicator from './components/ProgressIndicator';
+import UnauthorizedPage from '@/components/common/UnauthorizedPage';
 export default function Onboarding() {
   const { data: session, update } = useSession();
   const { setPreferences } = useContext(UserPreferencesContext);
@@ -67,8 +68,10 @@ export default function Onboarding() {
     }
   };
 
-  if (!session) return <div>Please sign in</div>;
-
+  if (!session) return <UnauthorizedPage />
+  if (session?.user?.profile?.meals?.length > 0) {
+    router.push('/mealplan');
+  }
   return (
     <>
       <ProgressIndicator step={step} />

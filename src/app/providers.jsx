@@ -5,7 +5,7 @@ import { SessionProvider } from "next-auth/react";
 import { UserPreferencesProvider } from "@/context/UserPreferencesContext";
 export function Providers({ children }) {
     return (
-        <SessionProvider session={children}>
+        <SessionProvider>
             <UserPreferencesProvider>
                 <Toaster position="top-center" reverseOrder={false} />
                 {children}

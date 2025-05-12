@@ -2,14 +2,12 @@ import { authOptions } from "../../auth/[...nextauth]/route";
 import { calculateCalories } from "@/utils/calculateCalories";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { getServerSession } from "next-auth";
+import { RecipeSchemaString } from "@/lib/schemaString";
+import connectDB from "@/common/db";
+import Recipe from "@/models/Recipe";
+
 const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY);
-const systemPrompt = `
-You are ChillMeal, a friendly AI assistant on a meal planning website.
-Your job is to help users plan their meals, suggest recipes, track nutrition,
-and answer food-related questions in a chill, friendly, and helpful tone.
-Don't be too formal—be conversational, like a friendly coach or foodie buddy.
-If the user seems lost, gently guide them to start with their goals (e.g., weight loss, muscle gain, healthy eating).
-`;
+
 export async function POST(req) {
     try {
         const session = await getServerSession(authOptions);
@@ -18,16 +16,8 @@ export async function POST(req) {
             return new Response("Unauthorized", { status: 401 });
         }
 
-        const body = await req.json();
-        const {
-            weight,
-            height,
-            age,
-            gender,
-            workHabits,
-            mealTypes,
-            date,
-        } = body;
+        const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
+        const { weight, height, age, gender, workHabits, mealTypes } = session.user.profile;
 
         const dailyCalories = calculateCalories({
             weight,
@@ -36,9 +26,6 @@ export async function POST(req) {
             gender,
             workHabits,
         });
-
-
-        const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
 
         const userInfo = {
             weight,
@@ -50,42 +37,13 @@ export async function POST(req) {
             meals: mealTypes,
         };
 
-
-
         const prompt = `
-${systemPrompt}
+User Info: ${JSON.stringify(userInfo, null, 2)}
 
-User Info:
-${JSON.stringify(userInfo, null, 2)}
+Recipe schema: ${RecipeSchemaString}
 
-Meal Plan schema:
-const MealPlanSchema = {
-  userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
-  date: { type: Date, required: true },
-  meals: [
-    {
-      type: { type: String, required: true },
-      recipeId: { type: mongoose.Schema.Types.ObjectId, ref: 'Recipe', required: true },
-      name: { type: String, required: true },
-      calories: { type: Number, required: true },
-      macros: {
-        protein: { type: Number, required: true },
-        carbs: { type: Number, required: true },
-        fat: { type: Number, required: true }
-      },
-      imageUrl: { type: String },
-    }
-  ],
-  totalCalories: { type: Number, required: true },
-  totalMacros: {
-    protein: { type: Number, required: true },
-    carbs: { type: Number, required: true },
-    fat: { type: Number, required: true }
-  },
-  targetCalories: { type: Number, required: true },
-};
-
-Generate a meal plan JSON match schema hit the user's targetCalories and include appropriate meals, no more extra text please!
+Please ensure the field "Please ensure the field "title" is always a short, unique, and consistent name for this dish, as it will be used to check for duplicates in the database." is always a short, unique, and consistent name for this dish, as it will be used to check for duplicates in the database.
+Generate a Recipe JSON match schema hit the user's targetCalories and user's preference, no more extra text please!
 IMPORTANT: Return only raw JSON. No markdown, no explanation, no wrapping in code blocks.
 
 `;
@@ -95,12 +53,7 @@ IMPORTANT: Return only raw JSON. No markdown, no explanation, no wrapping in cod
 
         let aiMealPlan;
         try {
-            // Strip triple backticks and "json" if included
-            const cleanResponse = response
-                .replace(/```json/, '')
-                .replace(/```/, '')
-                .trim();
-        
+            const cleanResponse = response.replace(/```json|```/g, "").trim();
             aiMealPlan = JSON.parse(cleanResponse);
         } catch (err) {
             console.error("Gemini response parse error:", response);
@@ -114,18 +67,34 @@ IMPORTANT: Return only raw JSON. No markdown, no explanation, no wrapping in cod
             );
         }
 
-        // const validatedMealPlan = MealPlanSchema.parse(aiMealPlan);
+        // 🔥 Fetch Unsplash image using recipe name
+        const query = `${aiMealPlan.englishName || "food"}`;
+        const unsplashImage = await fetch(
+            `https://api.unsplash.com/search/photos?query=${encodeURIComponent(
+                query
+            )}&page=1&per_page=5&content_filter=high&client_id=${process.env.UNSPLASH_ACCESS_KEY}`
+        );
+        const imgResult = await unsplashImage.json();
+        const imgUrl =
+            imgResult?.results?.[0]?.urls?.regular ||
+            "https://images.unsplash.com/photo-1504674900247-0877df9cc836?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D";
 
-        // const newMealPlan = await MealPlan.create({
-        //   userId: session.userId,
-        //   date: new Date(date),
-        //   meals: validatedMealPlan.meals,
-        //   totalCalories: validatedMealPlan.totalCalories,
-        //   totalMacros: validatedMealPlan.totalMacros,
-        //   targetCalories: validatedMealPlan.targetCalories,
-        // });
-
-        return new Response(JSON.stringify(aiMealPlan), {
+        // 🧠 Replace imageUrlD
+        aiMealPlan.imageUrl = imgUrl;
+        console.log("AI Meal Plan ~:", aiMealPlan);
+        await connectDB();
+        const existing = await Recipe.findOne({ title: aiMealPlan.title });
+        let savedRecipe;
+        if (!existing) {
+            savedRecipe = await Recipe.create(aiMealPlan);
+        } else {
+            savedRecipe = existing;
+        }
+        const responseWithId = {
+            ...aiMealPlan,
+            _id: savedRecipe._id,
+        };
+        return new Response(JSON.stringify(responseWithId), {
             status: 200,
             headers: { "Content-Type": "application/json" },
         });

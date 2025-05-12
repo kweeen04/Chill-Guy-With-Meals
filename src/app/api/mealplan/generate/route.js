@@ -7,10 +7,7 @@ import User from "../../../../models/User";
 
 export async function POST(req) {
   try {
-    console.log('Starting meal plan generation...');
-    
     const session = await getServerSession(authOptions);
-    console.log('Session data:', JSON.stringify(session, null, 2));
     
     if (!session) {
       return new Response(
